@@ -6,23 +6,20 @@ namespace SpaceShooter
 {
     /// <summary>
     /// This is the main type for your game.
-    ///
-    /// Kristoffer Barsum Te17 i kursen programmerring 2 2019-9-25
-    ///
+    /// /// Kristoffer Barsum, Te17 i kursen Programmering 2 2019-20.
     /// </summary>
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        // mina variabler:
+        Player player;
+        Enemy enemy;
+        PrintText printText;
 
-        Texture2D ship_texture;  // skeppets grafik
-        Vector2 ship_vector;     //skeppets position
-        Vector2 ship_speed; //rymdskeppets hastighet
+
 
         public Game1()
-
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -37,14 +34,8 @@ namespace SpaceShooter
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            //skeppets startposition
-            ship_vector.X = 380;
-            ship_vector.Y = 400;
-  
+            // skeppets startposition
 
-            //skeppets starthastighet
-            ship_speed.X = -2.5f;
-            ship_speed.Y = -4.5f;
 
             base.Initialize();
         }
@@ -53,14 +44,19 @@ namespace SpaceShooter
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
+        ///
+
+
         protected override void LoadContent()
         {
+
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            ship_texture = Content.Load<Texture2D>("ship");
-
+            player = new Player(Content.Load<Texture2D>("ship"), 380, 400, 4.5f, 4.5f);
+            enemy = new Enemy(Content.Load<Texture2D>("mine"), 0, 0);
+            printText = new PrintText(Content.Load<SpriteFont>("myFont"));
         }
 
         /// <summary>
@@ -70,6 +66,7 @@ namespace SpaceShooter
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+
         }
 
         /// <summary>
@@ -83,29 +80,8 @@ namespace SpaceShooter
                 Exit();
 
             // TODO: Add your update logic here
-
-            //Tangentbordstyrning
-            KeyboardState keyboardsate = Keyboard.GetState();
-     
-      
-
-
-            //skeppets förflyttning
-            ship_vector.X += ship_speed.X;
-
-            //förhindra skeppet att åka utanför sidkanterna
-            if(ship_vector.X < 0 || ship_vector.X > Window.ClientBounds.Width-ship_texture.Width)
-            {
-                ship_speed.X = ship_speed.X * -1;
-            }
-
-            ship_vector.Y += ship_speed.Y;
-            //förhindrar skeppet att åka utanför över- och underkanterna
-            if(ship_vector.Y < 0 || ship_vector.Y>Window.ClientBounds.Height-ship_texture.Height)
-            {
-                ship_speed.Y = ship_speed.Y * -1;
-            }
-
+            player.Update(Window);
+            enemy.Update(Window);
 
 
             base.Update(gameTime);
@@ -120,10 +96,13 @@ namespace SpaceShooter
             GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
-
             spriteBatch.Begin();
-            spriteBatch.Draw(ship_texture, ship_vector, Color.White);
+            player.Draw(spriteBatch);
+            enemy.Draw(spriteBatch);
+            printText.Print("testutskrft", spriteBatch, 0, 0);
+
             spriteBatch.End();
+
 
             base.Draw(gameTime);
         }
